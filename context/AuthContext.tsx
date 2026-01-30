@@ -66,6 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 uid: userCredential.user.uid,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
+                role: 'user', // Default role
+                preferences: {
+                    voiceEnabled: true,
+                    theme: 'system',
+                    notifications: true
+                },
                 ...additionalData
             });
         } catch (error) {
