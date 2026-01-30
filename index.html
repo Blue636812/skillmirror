@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartMate AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              glass: {
+                100: 'rgba(255, 255, 255, 0.05)',
+                200: 'rgba(255, 255, 255, 0.1)',
+                300: 'rgba(255, 255, 255, 0.15)',
+              },
+              ai: {
+                cyan: '#00f0ff',
+                violet: '#7000ff',
+                dark: '#050505',
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glow': 'glow 2s ease-in-out infinite alternate',
+            },
+            keyframes: {
+              glow: {
+                '0%': { boxShadow: '0 0 10px rgba(0, 240, 255, 0.1)' },
+                '100%': { boxShadow: '0 0 20px rgba(0, 240, 255, 0.4)' },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        background-color: #050505;
+        color: white;
+        overflow: hidden; /* Prevent scroll for the immersive feel */
+      }
+      /* Custom scrollbar for future content */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.2);
+        border-radius: 3px;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "tailwind-merge": "https://esm.sh/tailwind-merge@^3.4.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.29.2",
+    "clsx": "https://esm.sh/clsx@^2.1.1",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber@^9.5.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "three": "https://esm.sh/three@^0.182.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "@react-three/drei": "https://esm.sh/@react-three/drei@^10.7.7"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
