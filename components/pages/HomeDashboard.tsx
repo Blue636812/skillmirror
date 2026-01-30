@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Calendar, Zap, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { TaskBoard } from '../TaskBoard';
+import { RoutineBuilder } from '../RoutineBuilder';
 
 export const HomeDashboard: React.FC = () => {
   return (
@@ -32,27 +33,14 @@ export const HomeDashboard: React.FC = () => {
           <TaskBoard />
         </motion.div>
 
-        {/* Card 2: Schedule */}
+        {/* Card 2: Schedule (Routine Builder) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md flex flex-col justify-between"
+          className="h-[400px]"
         >
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-lg text-white/80 font-medium">Up Next</h3>
-              <p className="text-sm text-white/40">Today, 10:00 AM</p>
-            </div>
-            <Calendar className="w-6 h-6 text-violet-400" />
-          </div>
-          <div className="mt-8 p-4 rounded-xl bg-white/5 border border-white/5">
-            <p className="text-sm text-cyan-200">Product Strategy Sync</p>
-            <div className="flex items-center gap-2 mt-2 text-xs text-white/30">
-              <Clock className="w-3 h-3" />
-              <span>45 mins</span>
-            </div>
-          </div>
+          <RoutineBuilder />
         </motion.div>
 
         {/* Card 3: Quick Stats */}
