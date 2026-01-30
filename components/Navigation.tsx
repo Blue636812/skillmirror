@@ -1,27 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Home, MessageSquare, PenTool, Layout, Mic, BarChart2, LogOut } from 'lucide-react';
 import { PageType } from '../types';
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface NavigationProps {
-  currentPage: PageType;
-  onNavigate: (page: PageType) => void;
   onLogout: () => void;
+  // onNavigate removed as we use router
+  // currentPage derived from location
 }
 
-const navItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
-  { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" /> },
-  { id: 'core', label: 'Assistant', icon: <MessageSquare className="w-5 h-5" /> },
-  { id: 'writing', label: 'Writing', icon: <PenTool className="w-5 h-5" /> },
-  { id: 'virtual', label: 'Tasks', icon: <Layout className="w-5 h-5" /> },
-  { id: 'voice', label: 'Voice', icon: <Mic className="w-5 h-5" /> },
-  { id: 'insights', label: 'Insights', icon: <BarChart2 className="w-5 h-5" /> },
+const navItems: { id: PageType; label: string; icon: React.ReactNode; path: string }[] = [
+  { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" />, path: '/' },
+  { id: 'core', label: 'Assistant', icon: <MessageSquare className="w-5 h-5" />, path: '/core' },
+  { id: 'writing', label: 'Writing', icon: <PenTool className="w-5 h-5" />, path: '/writing' },
+  { id: 'virtual', label: 'Tasks', icon: <Layout className="w-5 h-5" />, path: '/virtual' },
+  { id: 'voice', label: 'Voice', icon: <Mic className="w-5 h-5" />, path: '/voice' },
+  { id: 'insights', label: 'Insights', icon: <BarChart2 className="w-5 h-5" />, path: '/insights' },
 ];
 
-export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onLogout }) => {
+export const Navigation: React.FC<NavigationProps> = ({ onLogout }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [currentPage, setCurrentPage] = useState<PageType>('home');
+
+  useEffect(() => {
+    const found = navItems.find(item => item.path === location.pathname);
+    if (found) {
+      setCurrentPage(found.id);
+    } else if (location.pathname === '/') {
+      setCurrentPage('home');
+    }
+  }, [location.pathname]);
+
   return (
-    <motion.div 
+    <motion.div
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.5, duration: 0.5 }}
@@ -31,11 +45,11 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate,
         {navItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => onNavigate(item.id)}
+            onClick={() => navigate(item.path)}
             className={clsx(
               "relative px-4 py-3 rounded-full flex items-center justify-center transition-all duration-300 group",
-              currentPage === item.id 
-                ? "bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.1)]" 
+              currentPage === item.id
+                ? "bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                 : "text-white/40 hover:text-white hover:bg-white/5"
             )}
             title={item.label}
@@ -48,17 +62,17 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate,
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            
+
             {/* Tooltip */}
             <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/80 border border-white/10 rounded text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               {item.label}
             </span>
           </button>
         ))}
-        
+
         <div className="w-px h-6 bg-white/10 mx-2" />
-        
-        <button 
+
+        <button
           onClick={onLogout}
           className="px-4 py-3 rounded-full text-red-400/60 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300"
           title="Logout"

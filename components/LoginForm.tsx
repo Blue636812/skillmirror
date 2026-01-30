@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
-import { Mail, Lock, ArrowRight, ShieldCheck, AlertCircle, Fingerprint, User } from 'lucide-react';
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { Mail, Lock, ArrowRight, ShieldCheck, User } from 'lucide-react';
 import { InteractionState, FormState, LoginCardProps } from '../types';
 import { Input } from './ui/Input';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
 
 export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, interactionState, onLoginSuccess }) => {
   const [form, setForm] = useState<FormState>({ email: '', password: '' });
   const [greeting, setGreeting] = useState("I'm Smart. Ready when you are.");
   const [isGuest, setIsGuest] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   // Mouse Parallax Logic
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  
+
   // Smooth out the mouse movement
   const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
   const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
@@ -23,12 +27,12 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
 
   // Handle global mouse move for parallax
   useEffect(() => {
-      const handleMouseMove = (e: MouseEvent) => {
-          x.set(e.clientX - window.innerWidth / 2);
-          y.set(e.clientY - window.innerHeight / 2);
-      };
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => window.removeEventListener('mousemove', handleMouseMove);
+    const handleMouseMove = (e: MouseEvent) => {
+      x.set(e.clientX - window.innerWidth / 2);
+      y.set(e.clientY - window.innerHeight / 2);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [x, y]);
 
   // Conversational Microcopy updates based on state
@@ -47,7 +51,7 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
         setGreeting(isGuest ? "Welcome, Guest. Access limited." : "Welcome back, Creator.");
         break;
       case 'error':
-        setGreeting("I couldn't verify that identity.");
+        // Greeting set by error handler
         break;
     }
   }, [interactionState, isGuest]);
@@ -56,8 +60,8 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     onInteractionChange('typing');
-    setIsGuest(false); // Reset guest flag on input interaction
-    
+    setIsGuest(false);
+
     // Debounce return to idle/focused
     setTimeout(() => {
       onInteractionChange('focused');
@@ -70,10 +74,11 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
     setGreeting("Initializing anonymous protocol...");
 
     setTimeout(() => {
-        onInteractionChange('success');
-        setTimeout(() => {
-            if(onLoginSuccess) onLoginSuccess();
-        }, 1000);
+      onInteractionChange('success');
+      setTimeout(() => {
+        if (onLoginSuccess) onLoginSuccess();
+        navigate('/');
+      }, 1000);
     }, 1500);
   };
 
@@ -81,25 +86,42 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
     e.preventDefault();
     setIsGuest(false);
     if (!form.email || !form.password) {
-        onInteractionChange('error');
-        setTimeout(() => onInteractionChange('idle'), 2000);
-        return;
+      onInteractionChange('error');
+      setGreeting("I need both identity and key.");
+      setTimeout(() => onInteractionChange('idle'), 2000);
+      return;
     }
 
     onInteractionChange('processing');
 
-    // Simulate backend verification
-    setTimeout(() => {
-      if (form.email.includes('admin')) {
-        onInteractionChange('success');
-        setTimeout(() => {
-            if(onLoginSuccess) onLoginSuccess();
-        }, 1000);
-      } else {
-        onInteractionChange('error');
-        setTimeout(() => onInteractionChange('idle'), 3000);
+    try {
+      await login(form.email, form.password);
+      onInteractionChange('success');
+      setTimeout(() => {
+        if (onLoginSuccess) onLoginSuccess();
+        navigate('/');
+      }, 1000);
+    } catch (err: any) {
+      console.error('Login error:', err);
+      onInteractionChange('error');
+
+      switch (err.code) {
+        case 'auth/user-not-found':
+        case 'auth/invalid-credential':
+        case 'auth/wrong-password':
+          setGreeting("Identity could not be verified.");
+          break;
+        case 'auth/invalid-email':
+          setGreeting("That identity format appears invalid.");
+          break;
+        case 'auth/too-many-requests':
+          setGreeting("Too many attempts. Stand by.");
+          break;
+        default:
+          setGreeting("Authentication protocol failed.");
       }
-    }, 2500);
+      setTimeout(() => onInteractionChange('idle'), 3000);
+    }
   };
 
   return (
@@ -115,14 +137,14 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
 
       {/* Main Glass Card */}
       <div className="relative bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-8 md:p-12 shadow-2xl overflow-hidden transform-style-3d">
-        
+
         {/* Dynamic Sheen/Reflection based on mouse position */}
-        <motion.div 
-            style={{ 
-                x: useTransform(mouseX, (val) => val / 5),
-                y: useTransform(mouseY, (val) => val / 5),
-            }}
-            className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-30 pointer-events-none rounded-[2rem]"
+        <motion.div
+          style={{
+            x: useTransform(mouseX, (val) => val / 5),
+            y: useTransform(mouseY, (val) => val / 5),
+          }}
+          className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-30 pointer-events-none rounded-[2rem]"
         />
 
         {/* Subtle inner reflection */}
@@ -141,10 +163,9 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
             <h1 className="text-3xl font-light tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 mb-2">
               Smart
             </h1>
-            <p className={`text-sm font-light tracking-wide h-6 ${
-              interactionState === 'error' ? 'text-red-400' : 
-              interactionState === 'success' ? 'text-emerald-400' : 'text-cyan-200/80'
-            }`}>
+            <p className={`text-sm font-light tracking-wide h-6 ${interactionState === 'error' ? 'text-red-400' :
+                interactionState === 'success' ? 'text-emerald-400' : 'text-cyan-200/80'
+              }`}>
               {greeting}
             </p>
           </motion.div>
@@ -163,7 +184,7 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
             icon={<Mail className="w-5 h-5" />}
             autoComplete="off"
           />
-          
+
           <Input
             label="Access Key"
             name="password"
@@ -183,9 +204,8 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
               className="group relative w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-4 flex items-center justify-center gap-2 overflow-hidden transition-all duration-300"
               disabled={interactionState === 'processing' || interactionState === 'success'}
             >
-              {/* Button gradient highlight */}
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent -translate-x-full group-hover:animate-shine" />
-              
+
               <span className="font-medium tracking-wide">
                 {interactionState === 'processing' ? 'Authenticating...' : 'Initialize Session'}
               </span>
@@ -193,8 +213,7 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
                 <ArrowRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
               )}
             </motion.button>
-            
-            {/* Guest Mode Button */}
+
             <motion.button
               type="button"
               onClick={handleGuestLogin}
@@ -203,18 +222,18 @@ export const LoginForm: React.FC<LoginCardProps> = ({ onInteractionChange, inter
               disabled={interactionState === 'processing' || interactionState === 'success'}
               className="w-full bg-transparent border border-white/5 text-white/40 hover:text-white hover:border-white/20 rounded-xl py-3 text-sm font-light tracking-wide transition-all duration-300 flex items-center justify-center gap-2"
             >
-                <User className="w-4 h-4" />
-                <span>Continue as Guest</span>
+              <User className="w-4 h-4" />
+              <span>Continue as Guest</span>
             </motion.button>
 
             <div className="flex items-center justify-between mt-4">
-               <button type="button" className="text-xs text-white/30 hover:text-white/60 transition-colors">
-                 Forgot key?
-               </button>
-               <div className="flex items-center gap-1 text-xs text-emerald-400/40">
-                 <ShieldCheck className="w-3 h-3" />
-                 <span>End-to-End Encrypted</span>
-               </div>
+              <Link to="/signup" className="text-xs text-white/30 hover:text-white/60 transition-colors">
+                Create Account
+              </Link>
+              <div className="flex items-center gap-1 text-xs text-emerald-400/40">
+                <ShieldCheck className="w-3 h-3" />
+                <span>End-to-End Encrypted</span>
+              </div>
             </div>
           </div>
         </form>
