@@ -15,7 +15,7 @@ import { VoiceAssistant } from './components/pages/VoiceAssistant';
 import { Insights } from './components/pages/Insights';
 import SignIn from './components/pages/SignIn';
 import SignUp from './components/pages/SignUp';
-import ProtectedRoute from './components/ProtectedRoute';
+import { RoleBasedRoute } from './components/RoleBasedRoute';
 
 const App: React.FC = () => {
   const [interactionState, setInteractionState] = useState<InteractionState>('idle');
@@ -109,8 +109,9 @@ const App: React.FC = () => {
               />
 
               {/* Protected Routes */}
+              {/* Protected Routes - Role Based */}
               <Route path="/" element={
-                <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['user', 'admin']}>
                   <motion.div
                     key="home"
                     initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
@@ -121,10 +122,10 @@ const App: React.FC = () => {
                   >
                     <HomeDashboard />
                   </motion.div>
-                </ProtectedRoute>
+                </RoleBasedRoute>
               } />
               <Route path="/core" element={
-                <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['user', 'admin']}>
                   <motion.div
                     key="core"
                     initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
@@ -135,10 +136,10 @@ const App: React.FC = () => {
                   >
                     <CoreAssistant />
                   </motion.div>
-                </ProtectedRoute>
+                </RoleBasedRoute>
               } />
               <Route path="/writing" element={
-                <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['user', 'admin']}>
                   <motion.div
                     key="writing"
                     initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
@@ -149,10 +150,10 @@ const App: React.FC = () => {
                   >
                     <WritingAssistant />
                   </motion.div>
-                </ProtectedRoute>
+                </RoleBasedRoute>
               } />
               <Route path="/virtual" element={
-                <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['user', 'admin']}>
                   <motion.div
                     key="virtual"
                     initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
@@ -163,10 +164,10 @@ const App: React.FC = () => {
                   >
                     <VirtualAssistant />
                   </motion.div>
-                </ProtectedRoute>
+                </RoleBasedRoute>
               } />
               <Route path="/voice" element={
-                <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['user', 'admin']}>
                   <motion.div
                     key="voice"
                     initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
@@ -177,10 +178,10 @@ const App: React.FC = () => {
                   >
                     <VoiceAssistant />
                   </motion.div>
-                </ProtectedRoute>
+                </RoleBasedRoute>
               } />
               <Route path="/insights" element={
-                <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['user', 'admin']}>
                   <motion.div
                     key="insights"
                     initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
@@ -191,7 +192,7 @@ const App: React.FC = () => {
                   >
                     <Insights />
                   </motion.div>
-                </ProtectedRoute>
+                </RoleBasedRoute>
               } />
             </Routes>
           </AnimatePresence>
