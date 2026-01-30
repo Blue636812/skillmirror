@@ -1,12 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Calendar, Zap, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { TaskBoard } from '../TaskBoard';
 
 export const HomeDashboard: React.FC = () => {
   return (
     <div className="w-full max-w-5xl mx-auto p-6 space-y-8">
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="space-y-2"
@@ -21,35 +22,18 @@ export const HomeDashboard: React.FC = () => {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Card 1: Daily Focus */}
-        <motion.div 
+        {/* Card 1: Daily Focus (Task Board) */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="col-span-2 bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md relative overflow-hidden group hover:bg-white/10 transition-colors"
+          className="col-span-2 h-[400px]"
         >
-          <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-40 transition-opacity">
-            <Zap className="w-24 h-24 text-cyan-400" />
-          </div>
-          <h3 className="text-lg text-white/80 font-medium mb-4">Focus Protocol</h3>
-          <div className="space-y-4 relative z-10">
-            <div className="flex items-center gap-3 text-white/60">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              <span>Review Q3 AI Analytics</span>
-            </div>
-            <div className="flex items-center gap-3 text-white/60">
-              <div className="w-5 h-5 rounded-full border border-white/20" />
-              <span>Draft keynote speech for Tomorrow Conference</span>
-            </div>
-            <div className="flex items-center gap-3 text-white/60">
-               <div className="w-5 h-5 rounded-full border border-white/20" />
-              <span>Optimize neural model parameters</span>
-            </div>
-          </div>
+          <TaskBoard />
         </motion.div>
 
         {/* Card 2: Schedule */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -72,7 +56,7 @@ export const HomeDashboard: React.FC = () => {
         </motion.div>
 
         {/* Card 3: Quick Stats */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -87,9 +71,9 @@ export const HomeDashboard: React.FC = () => {
             <div className="h-full w-[98%] bg-gradient-to-r from-cyan-400 to-emerald-400" />
           </div>
         </motion.div>
-        
+
         {/* Card 4: Recent Prompt */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
